@@ -1,4 +1,11 @@
 # pkg
 apt w no root
 # install
-`cd ~ && git clone https://github.com/xmm16/pkg .pkg && mv .pkg/pkg ~/pkg && source .bashrc && chmod +x pkg`
+```
+echo 'PATH=~/.pkg/:$PATH' >> ~/.bashrc &&\
+git clone https://github.com/eshnd/pkg ~/.pkg &&\
+source ~/.bashrc
+```
+# usage
+`~/.pkg/pkg setup` - each time you connect to webshell (it doesn't auto execute .bashrc usually)
+`pkg <package-name>` to install things

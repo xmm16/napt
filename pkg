@@ -20,22 +20,16 @@ if __name__ == "__main__":
 
     sys.argv[1] = sys.argv[1].lower().strip()
 
-    if sys.argv[1] == "setup":
-        os.system("echo 'source ~/.bashrc' > ~/.pkgsetup")
+    if sys.argv[1] == "prep":
+        os.system("/bin/bash -c 'source ~/.bashrc'")
         print("SUCCESSFUL!")
         sys.exit()
 
     if sys.argv[1] == "reset":
-        os.system("rm -rf ~/.pkgsetup ~/.pkgbin")
-        print("SUCCESSFUL!")
+        os.system("rm -rf ~/.pkgbin && rm -rf ~/.bashrc")
+        print("SUCCESSFUL! PLEASE REFRESH THE WEBPAGE!")
         sys.exit()
 
-    if sys.argv[1] == "prep":
-        os.system("chmod +x ~/.pkgsetup && /bin/bash -c 'source ~/.pkgsetup'")
-        print("SUCCESSFUL!")
-        sys.exit()
-
-    
     string = get_web_string(f"https://packages.debian.org/trixie/amd64/{sys.argv[1]}/download")
 
     string_start = string.index("http://ftp.us.debian.org/debian/pool/main/")
@@ -53,21 +47,19 @@ if __name__ == "__main__":
             os.system(f"dpkg -x {sys.argv[1]}.deb ~/.pkgbin/{sys.argv[1]}")
 
         else:
-            print(f"PROGRAM ERR - PATH .pkgbin/{sys.argv[1]} EXISTS")
+            print(f"PROGRAM ERR - PATH ~/.pkgbin/{sys.argv[1]} ALREADY EXISTS")
             os.remove(f"{sys.argv[1]}.deb")
             sys.exit()
         
-        add_path_string = f"echo PATH=\"~/.pkgbin/{sys.argv[1]}/usr/bin/:$PATH\""
+        add_path_string = f"PATH=\"~/.pkgbin/{sys.argv[1]}/usr/bin/:$PATH\""
 
-        with open(f"/home/{getpass.getuser()}/.pkgsetup", "r") as f:
+        with open(f"/home/{getpass.getuser()}/.bashrc", "r") as f:
             data = f.read()
 
-        with open(f"/home/{getpass.getuser()}/.pkgsetup", "w") as f:
+        with open(f"/home/{getpass.getuser()}/.bashrc", "w") as f:
             f.write(f"{data}\n{add_path_string}")
-            print(f"{data}\n{add_path_string[5:]}")
 
-
-        os.system("chmod +x ~/.pkgsetup && /bin/bash -c 'source ~/.pkgsetup'")
+        os.system("/bin/bash -c 'source ~/.bashrc'")
 
         os.remove(f"{sys.argv[1]}.deb")
 
