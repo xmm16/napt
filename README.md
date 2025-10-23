@@ -5,7 +5,7 @@ apt w no root
 cp ~/.bashrc .bashrc_old &&\
 rm -rf ~/.bashrc &&\
 mv .bashrc_old ~/.bashrc &&\
-echo -e '\nPATH=~/.pkg/:$PATH' >> ~/.bashrc &&\
+echo -e '\nPATH=~/.pkg/:$PATH\nalias pkgupd="source ~/.bashrc"' >> ~/.bashrc &&\
 git clone https://github.com/xmm16/pkg ~/.pkg &&\
 source ~/.bashrc
 ```
