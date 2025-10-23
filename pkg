@@ -4,6 +4,7 @@ import getpass
 import requests
 import sys
 import os
+# from pathlib import Path
 
 tilda = f"/home/{getpass.getuser()}"
 
@@ -16,17 +17,25 @@ def get_web_string(url):
         print(f"REQUEST ERR - {response.status_code}")
         sys.exit()
 
+# def merge_dirs(parent):
+#     files = [f for f in Path(parent).iterdir() if f.is_file()]
+#
+
+
 def install(to_install):
     to_install = to_install.lower().strip()
     if to_install == "":
         return
 
-    string = get_web_string(f"https://packages.debian.org/trixie/amd64/{to_install}/download")
+    string = get_web_string(f"https://packages.debian.org/bookworm/amd64/{to_install}/download")
 
-    string_start = string.index("http://ftp.us.debian.org/debian/pool/main/")
-    string = string[string_start:]
-    string_end = string.index("\"")
-    string = string[:string_end]
+    try:
+        string_start = string.index("http://ftp.us.debian.org/debian/pool/main/")
+        string = string[string_start:]
+        string_end = string.index("\"")
+        string = string[:string_end]
+    except:
+        return
 
     if subprocess.run(f"dpkg -s {to_install}", shell=True, stdout=subprocess.PIPE, text=True, stderr=subprocess.STDOUT).stdout[0] == 'P':
         print(f"{to_install} PACKAGE ALREADY INSTALLED WITH APT, SKIPPING INSTALL")
