@@ -5,6 +5,8 @@ import requests
 import sys
 import os
 
+tilda = f"/home/{getpass.getuser()}"
+
 def get_web_string(url):
     response = requests.get(url)
     
@@ -31,22 +33,22 @@ def install(to_install):
     try:
         os.system(f"wget -O {to_install}.deb {string}")
 
-        if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin/{to_install}"):
-            os.system(f"dpkg -x {to_install}.deb ~/.pkgbin/{to_install}")
+        if not os.path.exists(f"/{tilda}/.pkgbin/{to_install}"):
+            os.system(f"mkdir {tilda}/.pkgbin/{to_install} && dpkg -x {to_install}.deb {tilda}/.pkgbin/{to_install}")
 
         else:
-            print(f"PATH ~/.pkgbin/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
+            print(f"PATH {tilda}/.pkgbin/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
             return
 
-        if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin"):
-            os.system("mkdir ~/.pkgbin")
+        if not os.path.exists(f"/{tilda}/.pkgbin"):
+            os.system(f"mkdir {tilda}/.pkgbin")
 
-        add_path_string = f"PATH=\"~/.pkgbin/{to_install}/usr/bin/:$PATH\""
+        add_path_string = f"PATH=\"{tilda}/.pkgbin/{to_install}/usr/bin/:$PATH\""
 
-        with open(f"/home/{getpass.getuser()}/.pkgrc", "r") as f:
+        with open(f"/{tilda}/.pkgrc", "r") as f:
             data = f.read()
 
-        with open(f"/home/{getpass.getuser()}/.pkgrc", "w") as f:
+        with open(f"/{tilda}/.pkgrc", "w") as f:
             f.write(f"{data}\n{add_path_string}")
 
         
@@ -77,7 +79,7 @@ def install(to_install):
 
     except Exception as e:
         os.remove(f"{to_install}.deb")
-        os.system(f"rm -rf ~/.pkgbin/{to_install}")
+        os.system(f"rm -rf {tilda}/.pkgbin/{to_install}")
 
         print(f"UNHANDLED ERR - {e}")
 
