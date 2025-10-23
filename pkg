@@ -1,4 +1,5 @@
 #!/bin/python3
+import subprocess
 import getpass
 import requests
 import sys
@@ -13,35 +14,34 @@ def get_web_string(url):
         print(f"REQUEST ERR - {response.status_code}")
         sys.exit()
 
-if __name__ == "__main__":
-    if len(sys.argv) <= 1:
-        print("PROGRAM ERR - NO ARGUMENTS")
-        sys.exit()
+def install(to_install):
+    to_install = to_install.lower().strip()
 
-    sys.argv[1] = sys.argv[1].lower().strip()
-
-    string = get_web_string(f"https://packages.debian.org/trixie/amd64/{sys.argv[1]}/download")
+    string = get_web_string(f"https://packages.debian.org/trixie/amd64/{to_install}/download")
 
     string_start = string.index("http://ftp.us.debian.org/debian/pool/main/")
     string = string[string_start:]
     string_end = string.index("\"")
     string = string[:string_end]
 
+    if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin/{to_install}"):
+        os.system(f"dpkg -x {to_install}.deb ~/.pkgbin/{to_install}")
+
+    else:
+        print(f"PATH ~/.pkgbin/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
+        return
+
+    if subprocess.run(f"dpkg -s {to_install}", shell=True, capture_output=True, text=True).stdout[0] == 'P':
+        print(f"{to_install} PACKAGE ALREADY INSTALLED WITH APT, SKIPPING INSTALL")
+        return
+
     try:
-        os.system(f"wget -O {sys.argv[1]}.deb {string}")
+        os.system(f"wget -O {to_install}.deb {string}")
 
         if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin"):
             os.system("mkdir ~/.pkgbin")
 
-        if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin/{sys.argv[1]}"):
-            os.system(f"dpkg -x {sys.argv[1]}.deb ~/.pkgbin/{sys.argv[1]}")
-
-        else:
-            print(f"PROGRAM ERR - PATH ~/.pkgbin/{sys.argv[1]} ALREADY EXISTS")
-            os.remove(f"{sys.argv[1]}.deb")
-            sys.exit()
-        
-        add_path_string = f"PATH=\"~/.pkgbin/{sys.argv[1]}/usr/bin/:$PATH\""
+        add_path_string = f"PATH=\"~/.pkgbin/{to_install}/usr/bin/:$PATH\""
 
         with open(f"/home/{getpass.getuser()}/.pkgrc", "r") as f:
             data = f.read()
@@ -49,12 +49,40 @@ if __name__ == "__main__":
         with open(f"/home/{getpass.getuser()}/.pkgrc", "w") as f:
             f.write(f"{data}\n{add_path_string}")
 
-        os.remove(f"{sys.argv[1]}.deb")
+        depends = subprocess.run(f"dpkg-deb -f {to_install}.deb Depends", shell=True, capture_output=True, text=True).stdout
+        depends_items = [""]
+
+        paren_mode = False
+
+        for i in range(len(depends)):
+            if depends[i] == '(':
+                paren_mode = True
+                continue
+            
+            if depends[i] == ')':
+                paren_mode = False
+                depends_items.append("")
+                continue
+
+            if not paren_mode:
+                depends_items[-1] += depends[i]
+
+        for i in depends_items:
+            install(i)
+
+        os.remove(f"{to_install}.deb")
 
         print("INSTALL SUCCESSFUL probably idk")
 
     except Exception as e:
-        os.remove(f"{sys.argv[1]}.deb")
-        os.system(f"rm -rf ~/.pkgbin/{sys.argv[1]}")
+        os.remove(f"{to_install}.deb")
+        os.system(f"rm -rf ~/.pkgbin/{to_install}")
 
         print(f"UNHANDLED ERR - {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) <= 1:
+        print("PROGRAM ERR - NO ARGUMENTS")
+        sys.exit()
+
+    install(sys.argv[1])
