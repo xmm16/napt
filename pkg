@@ -18,6 +18,8 @@ def get_web_string(url):
 
 def install(to_install):
     to_install = to_install.lower().strip()
+    if to_install == "":
+        return
 
     string = get_web_string(f"https://packages.debian.org/trixie/amd64/{to_install}/download")
 
