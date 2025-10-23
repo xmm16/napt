@@ -20,16 +20,6 @@ if __name__ == "__main__":
 
     sys.argv[1] = sys.argv[1].lower().strip()
 
-    if sys.argv[1] == "prep":
-        os.system("/bin/bash -c 'source ~/.bashrc'")
-        print("SUCCESSFUL!")
-        sys.exit()
-
-    if sys.argv[1] == "reset":
-        os.system("rm -rf ~/.pkgbin && rm -rf ~/.bashrc")
-        print("SUCCESSFUL! PLEASE REFRESH THE WEBPAGE!")
-        sys.exit()
-
     string = get_web_string(f"https://packages.debian.org/trixie/amd64/{sys.argv[1]}/download")
 
     string_start = string.index("http://ftp.us.debian.org/debian/pool/main/")
@@ -53,13 +43,11 @@ if __name__ == "__main__":
         
         add_path_string = f"PATH=\"~/.pkgbin/{sys.argv[1]}/usr/bin/:$PATH\""
 
-        with open(f"/home/{getpass.getuser()}/.bashrc", "r") as f:
+        with open(f"/home/{getpass.getuser()}/.pkgrc", "r") as f:
             data = f.read()
 
-        with open(f"/home/{getpass.getuser()}/.bashrc", "w") as f:
+        with open(f"/home/{getpass.getuser()}/.pkgrc", "w") as f:
             f.write(f"{data}\n{add_path_string}")
-
-        os.system("/bin/bash -c 'source ~/.bashrc'")
 
         os.remove(f"{sys.argv[1]}.deb")
 
