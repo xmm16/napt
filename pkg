@@ -31,7 +31,7 @@ def install(to_install):
         print(f"PATH ~/.pkgbin/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
         return
 
-    if subprocess.run(f"dpkg -s {to_install}", shell=True, capture_output=True, text=True).stdout[0] == 'P':
+    if subprocess.run(f"dpkg -s {to_install}", shell=True, capture_output=True, text=True, stderr=subprocess.STDOUT).stdout[0] == 'P':
         print(f"{to_install} PACKAGE ALREADY INSTALLED WITH APT, SKIPPING INSTALL")
         return
 
@@ -49,7 +49,8 @@ def install(to_install):
         with open(f"/home/{getpass.getuser()}/.pkgrc", "w") as f:
             f.write(f"{data}\n{add_path_string}")
 
-        depends = subprocess.run(f"dpkg-deb -f {to_install}.deb Depends", shell=True, capture_output=True, text=True).stdout
+        
+        depends = subprocess.run(f"dpkg-deb -f {to_install}.deb Depends", shell=True, capture_output=True, text=True, stderr=subprocess.STDOUT).stdout
         depends_items = [""]
 
         paren_mode = False
