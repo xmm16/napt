@@ -29,14 +29,14 @@ def install(to_install):
         return
 
     try:
+        os.system(f"wget -O {to_install}.deb {string}")
+
         if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin/{to_install}"):
             os.system(f"dpkg -x {to_install}.deb ~/.pkgbin/{to_install}")
 
         else:
             print(f"PATH ~/.pkgbin/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
             return
-        
-        os.system(f"wget -O {to_install}.deb {string}")
 
         if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin"):
             os.system("mkdir ~/.pkgbin")
