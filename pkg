@@ -33,15 +33,15 @@ def install(to_install):
     try:
         os.system(f"wget -O {to_install}.deb {string}")
 
+        if not os.path.exists(f"/{tilda}/.pkgbin"):
+            os.system(f"mkdir {tilda}/.pkgbin")
+
         if not os.path.exists(f"/{tilda}/.pkgbin/{to_install}"):
             os.system(f"mkdir {tilda}/.pkgbin/{to_install} && dpkg -x {to_install}.deb {tilda}/.pkgbin/{to_install}")
 
         else:
             print(f"PATH {tilda}/.pkgbin/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
             return
-
-        if not os.path.exists(f"/{tilda}/.pkgbin"):
-            os.system(f"mkdir {tilda}/.pkgbin")
 
         add_path_string = f"PATH=\"{tilda}/.pkgbin/{to_install}/usr/bin/:$PATH\""
 
