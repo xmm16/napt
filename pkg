@@ -69,6 +69,9 @@ def install(to_install):
                 depends_items.append("")
                 continue
 
+            if depends[i] == ',':
+                continue
+
             if not paren_mode:
                 depends_items[-1] += depends[i]
 
