@@ -1,0 +1,64 @@
+#!/bin/python3
+
+import requests
+import sys
+import os
+
+def get_web_string(url):
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        return response.text
+    else:
+        print(f"REQUEST ERR - {response.status_code}")
+        sys.exit()
+
+if __name__ == "__main__":
+    if len(sys.argv) <= 1:
+        print("PROGRAM ERR - NO ARGUMENTS")
+        sys.exit()
+
+    if sys.argv[1].lower().strip == "setup":
+        os.system("echo 'source ~/.bashrc' >> ~/.pkgsetup")
+
+    if sys.argv[1].lower().strip() == "init":
+        os.system("chmod +x ~/.pkgsetup && source ~/.pkgsetup")
+    
+    string = get_web_string(f"https://packages.debian.org/trixie/amd64/{sys.argv[1]}/download")
+
+    string_start = string.index("http://ftp.us.debian.org/debian/pool/main/")
+    string = string[string_start:]
+    string_end = string.index("\"")
+    string = string[:string_end]
+
+    os.system(f"wget -O newpack.deb {string}")
+
+    try:
+        if not os.path.exists("~/.pkgbin"):
+            os.system("mkdir ~/.pkgbin")
+
+        if not os.path.exists(f"~/.pkgbin/{sys.argv[1]}"):
+            os.system(f"dpkg -x newpack.deb ~/.pkgbin/{sys.argv[1]}")
+
+        else:
+            print(f"PROGRAM ERR - PATH .pkgbin/{sys.argv[1]} EXISTS")
+            os.remove("newpack.deb")
+            sys.exit()
+        
+        add_path_string = f"echo PATH=\"~/.pkgbin/{sys.argv[1]}/usr/bin/:$PATH\""
+
+        with open("~/.pkgsetup", "r") as f:
+            data = f.read()
+
+        with open("~/.pkgsetup", "w") as f:
+            f.write(f"{data}\n{add_path_string}")
+
+        os.system("chmod +x ~/.pkgsetup && source ~/.pkgsetup")
+
+        print("Install successful! (probably idk)")
+
+    except Exception e:
+        os.remove("newpack.deb")
+        os.system("rm -rf ~/.pkgbin/{sys.argv[1]}")
+
+        print(f"UNHANDLED ERR - {e}")
