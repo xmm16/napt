@@ -2,8 +2,11 @@
 apt w no root
 # install
 ```
+cp ~/.bashrc .bashrc_old &&\
+rm -rf ~/.bashrc &&\
+mv .bashrc_old ~/.bashrc &&\
 echo 'PATH=~/.pkg/:$PATH' >> ~/.bashrc &&\
-git clone https://github.com/eshnd/pkg ~/.pkg &&\
+git clone https://github.com/xmm16/pkg ~/.pkg &&\
 source ~/.bashrc
 ```
 # usage
