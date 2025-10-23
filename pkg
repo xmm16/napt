@@ -24,18 +24,18 @@ def install(to_install):
     string_end = string.index("\"")
     string = string[:string_end]
 
-    if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin/{to_install}"):
-        os.system(f"dpkg -x {to_install}.deb ~/.pkgbin/{to_install}")
-
-    else:
-        print(f"PATH ~/.pkgbin/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
-        return
-
     if subprocess.run(f"dpkg -s {to_install}", shell=True, stdout=subprocess.PIPE, text=True, stderr=subprocess.STDOUT).stdout[0] == 'P':
         print(f"{to_install} PACKAGE ALREADY INSTALLED WITH APT, SKIPPING INSTALL")
         return
 
     try:
+        if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin/{to_install}"):
+            os.system(f"dpkg -x {to_install}.deb ~/.pkgbin/{to_install}")
+
+        else:
+            print(f"PATH ~/.pkgbin/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
+            return
+        
         os.system(f"wget -O {to_install}.deb {string}")
 
         if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin"):
