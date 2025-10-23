@@ -1,5 +1,5 @@
 #!/bin/python3
-
+import getpass
 import requests
 import sys
 import os
@@ -18,11 +18,23 @@ if __name__ == "__main__":
         print("PROGRAM ERR - NO ARGUMENTS")
         sys.exit()
 
-    if sys.argv[1].lower().strip == "setup":
-        os.system("echo 'source ~/.bashrc' >> ~/.pkgsetup")
+    sys.argv[1] = sys.argv[1].lower().strip()
 
-    if sys.argv[1].lower().strip() == "init":
-        os.system("chmod +x ~/.pkgsetup && source ~/.pkgsetup")
+    if sys.argv[1] == "setup":
+        os.system("echo 'source ~/.bashrc' > ~/.pkgsetup")
+        print("SUCCESSFUL!")
+        sys.exit()
+
+    if sys.argv[1] == "reset":
+        os.system("rm -rf ~/.pkgsetup ~/.pkgbin")
+        print("SUCCESSFUL!")
+        sys.exit()
+
+    if sys.argv[1] == "prep":
+        os.system("chmod +x ~/.pkgsetup && /bin/bash -c 'source ~/.pkgsetup'")
+        print("SUCCESSFUL!")
+        sys.exit()
+
     
     string = get_web_string(f"https://packages.debian.org/trixie/amd64/{sys.argv[1]}/download")
 
@@ -31,34 +43,38 @@ if __name__ == "__main__":
     string_end = string.index("\"")
     string = string[:string_end]
 
-    os.system(f"wget -O newpack.deb {string}")
-
     try:
-        if not os.path.exists("~/.pkgbin"):
+        os.system(f"wget -O {sys.argv[1]}.deb {string}")
+
+        if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin"):
             os.system("mkdir ~/.pkgbin")
 
-        if not os.path.exists(f"~/.pkgbin/{sys.argv[1]}"):
-            os.system(f"dpkg -x newpack.deb ~/.pkgbin/{sys.argv[1]}")
+        if not os.path.exists(f"/home/{getpass.getuser()}/.pkgbin/{sys.argv[1]}"):
+            os.system(f"dpkg -x {sys.argv[1]}.deb ~/.pkgbin/{sys.argv[1]}")
 
         else:
             print(f"PROGRAM ERR - PATH .pkgbin/{sys.argv[1]} EXISTS")
-            os.remove("newpack.deb")
+            os.remove(f"{sys.argv[1]}.deb")
             sys.exit()
         
         add_path_string = f"echo PATH=\"~/.pkgbin/{sys.argv[1]}/usr/bin/:$PATH\""
 
-        with open("~/.pkgsetup", "r") as f:
+        with open(f"/home/{getpass.getuser()}/.pkgsetup", "r") as f:
             data = f.read()
 
-        with open("~/.pkgsetup", "w") as f:
+        with open(f"/home/{getpass.getuser()}/.pkgsetup", "w") as f:
             f.write(f"{data}\n{add_path_string}")
+            print(f"{data}\n{add_path_string[5:]}")
 
-        os.system("chmod +x ~/.pkgsetup && source ~/.pkgsetup")
 
-        print("Install successful! (probably idk)")
+        os.system("chmod +x ~/.pkgsetup && /bin/bash -c 'source ~/.pkgsetup'")
 
-    except Exception e:
-        os.remove("newpack.deb")
-        os.system("rm -rf ~/.pkgbin/{sys.argv[1]}")
+        os.remove(f"{sys.argv[1]}.deb")
+
+        print("INSTALL SUCCESSFUL probably idk")
+
+    except Exception as e:
+        os.remove(f"{sys.argv[1]}.deb")
+        os.system(f"rm -rf ~/.pkgbin/{sys.argv[1]}")
 
         print(f"UNHANDLED ERR - {e}")
