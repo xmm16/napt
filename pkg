@@ -46,6 +46,7 @@ def install(to_install):
 
         else:
             print(f"PATH {tilda}/.pkgsys/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
+            os.remove(f"{to_install}.deb")
             return
 
         add_path_string = f"export PATH=\"{tilda}/.pkgsys/{to_install}/usr/bin/:$PATH\""
