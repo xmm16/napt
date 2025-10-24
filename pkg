@@ -36,23 +36,23 @@ def install(to_install, upgrade=False):
         return
 
     try:
-        os.system(f"wget -O {to_install}.deb {string}")
+        os.system(f"wget -O /tmp/{to_install}.deb {string}")
 
-        if not os.path.exists(f"/{tilda}/.pkgsys"):
-            os.system(f"mkdir {tilda}/.pkgsys")
+        if not os.path.exists(f"/tmp/.pkgsys"):
+            os.system(f"mkdir /tmp/.pkgsys")
 
-        if not os.path.exists(f"/{tilda}/.pkgsys/{to_install}") or upgrade:
-            os.system(f"mkdir {tilda}/.pkgsys/{to_install} && dpkg -x {to_install}.deb {tilda}/.pkgsys/{to_install}")
+        if not os.path.exists(f"/tmp/.pkgsys/{to_install}") or upgrade:
+            os.system(f"mkdir /tmp/.pkgsys/{to_install} && dpkg -x /tmp/{to_install}.deb /tmp/.pkgsys/{to_install}")
 
         else:
-            print(f"PATH {tilda}/.pkgsys/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
-            os.remove(f"{to_install}.deb")
+            print(f"PATH /tmp/.pkgsys/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
+            os.remove(f"/tmp/{to_install}.deb")
             return
 
-        add_path_string = f"export PATH=\"{tilda}/.pkgsys/{to_install}/usr/bin/:$PATH\""
+        add_path_string = f"export PATH=\"/tmp/.pkgsys/{to_install}/usr/bin/:$PATH\""
 
-        if os.path.exists(f"{tilda}/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu"):
-            add_lib_string = f'export LD_LIBRARY_PATH="{tilda}/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"'
+        if os.path.exists(f"/tmp/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu"):
+            add_lib_string = f'export LD_LIBRARY_PATH="/tmp/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"'
         else:
             add_lib_string = ""
 
@@ -63,7 +63,7 @@ def install(to_install, upgrade=False):
             f.write(f"{data}\n{add_path_string}\n{add_lib_string}")
 
         # for stdout
-        depends = subprocess.run(f"dpkg-deb -f {to_install}.deb Depends", shell=True, text=True, capture_output=True).stdout
+        depends = subprocess.run(f"dpkg-deb -f /tmp/{to_install}.deb Depends", shell=True, text=True, capture_output=True).stdout
         depends_items = [""]
 
         paren_mode = False
@@ -87,13 +87,13 @@ def install(to_install, upgrade=False):
         for i in depends_items:
             install(i, upgrade)
 
-        os.remove(f"{to_install}.deb")
+        os.remove(f"/tmp/{to_install}.deb")
 
         print("INSTALL SUCCESSFUL")
 
     except Exception as e:
-        os.remove(f"{to_install}.deb")
-        os.system(f"rm -rf {tilda}/.pkgsys/{to_install}")
+        os.remove(f"/tmp/{to_install}.deb")
+        os.system(f"rm -rf /tmp/.pkgsys/{to_install}")
 
         print(f"UNHANDLED ERR - {e}")
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
     if sys.argv[1].lower().strip() == "__rcsetup":
         with open(f"{tilda}/.pkgrc", 'w') as f:
-            f.write(f"export PATH={tilda}/.pkg/:$PATH\nalias pkgupd=\"source {tilda}/.pkgrc\"")
+            f.write(f"export PATH={tilda}/.pkg/:$PATH\nalias pkgupd=\"source {tilda}/.pkgrc && pkgsave\"")
 
         sys.exit()
     if (len(sys.argv) >= 3):

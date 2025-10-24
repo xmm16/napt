@@ -8,7 +8,9 @@ chmod +x ~/.pkg/* &&\
 source ~/.pkgrc
 ```
 # usage
-`source ~/.pkgrc` everytime you connect to webshell     
-`pkg <package-name>` to install things     
-`pkgupd` to update your package list (run right after installing any package)     
-`pkgrm <package-name>` remove things      
+`source ~/.pkgrc` everytime you connect to webshell
+`pkgload` if you want to load your packages from your last connection
+`pkg <package-name>` to install a package and its dependencies
+`pkg <package-name> upgrade` to upgrade a package and its dependencies
+`pkgupd` to update and save your package list (run right after installing any package)
+`pkgrm <package-name>` remove a package
