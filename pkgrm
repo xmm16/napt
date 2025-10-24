@@ -1,2 +1,2 @@
 #!/bin/bash
-rm -rf ~/.pkgbin/$1
+rm -rf ~/.pkgsys/$1
