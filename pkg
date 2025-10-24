@@ -50,6 +50,7 @@ def install(to_install, upgrade=False):
             return
 
         add_path_string = f"export PATH=\"/tmp/.pkgsys/{to_install}/usr/bin/:$PATH\""
+        add_path_string = f"export PATH=\"/tmp/.pkgsys/{to_install}/bin/:$PATH\""
 
         if os.path.exists(f"/tmp/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu"):
             add_lib_string = f'export LD_LIBRARY_PATH="/tmp/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"'
