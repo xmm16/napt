@@ -101,4 +101,8 @@ if __name__ == "__main__":
         print("PROGRAM ERR - NO ARGUMENTS")
         sys.exit()
 
+    if sys.argv[1].lower().strip() == "__rcsetup":
+        os.system(f"touch {tilda}/.pkgrc")
+        os.system(f"echo -e '\nPATH={tilda}/.pkg/:$PATH\nalias pkgupd=\"source {tilda}/.pkgrc\"' >> {tilda}/.pkgrc")
+
     install(sys.argv[1])

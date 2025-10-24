@@ -4,8 +4,7 @@ apt with no root
 ```
 git clone https://github.com/xmm16/pkg ~/.pkg &&\
 chmod +x ~/.pkg/* &&\
-touch ~/.pkgrc &&\
-echo -e '\nPATH=~/.pkg/:$PATH\nalias pkgupd="source ~/.pkgrc"' >> ~/.pkgrc &&\
+~/.pkg/pkg __rcsetup &&\
 source ~/.pkgrc
 ```
 # usage
