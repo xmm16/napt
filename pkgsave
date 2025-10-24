@@ -1,4 +1,3 @@
 #!/bin/bash
-7z a ~/.pkgsys /tmp/.pkgsys && rm -rf /tmp/.pkgsys
-# && so that it only deletes if archive works
+7z a ~/.pkgsys /tmp/.pkgsys
 
