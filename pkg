@@ -16,7 +16,7 @@ def get_web_string(url):
         print(f"REQUEST ERR - {response.status_code}")
         sys.exit()
 
-def install(to_install):
+def install(to_install, upgrade=False):
     to_install = to_install.lower().strip()
     if to_install == "":
         return
@@ -41,7 +41,7 @@ def install(to_install):
         if not os.path.exists(f"/{tilda}/.pkgsys"):
             os.system(f"mkdir {tilda}/.pkgsys")
 
-        if not os.path.exists(f"/{tilda}/.pkgsys/{to_install}"):
+        if not os.path.exists(f"/{tilda}/.pkgsys/{to_install}") or upgrade:
             os.system(f"mkdir {tilda}/.pkgsys/{to_install} && dpkg -x {to_install}.deb {tilda}/.pkgsys/{to_install}")
 
         else:
@@ -85,7 +85,7 @@ def install(to_install):
                 depends_items[-1] += depends[i]
 
         for i in depends_items:
-            install(i)
+            install(i, upgrade)
 
         os.remove(f"{to_install}.deb")
 
@@ -106,6 +106,9 @@ if __name__ == "__main__":
         with open(f"{tilda}/.pkgrc", 'w') as f:
             f.write(f"export PATH={tilda}/.pkg/:$PATH\nalias pkgupd=\"source {tilda}/.pkgrc\"")
 
+        sys.exit()
+    if (len(sys.argv) >= 3):
+        install(sys.argv[1], True if sys.argv[2].lower().strip() == "upgrade" else False)
         sys.exit()
 
     install(sys.argv[1])
