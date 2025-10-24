@@ -1,1 +1,2 @@
-7z x ~/.pkgsys /tmp
+7z x ~/.pkgsys -o/tmp
+
