@@ -88,7 +88,7 @@ def install(to_install):
 
         os.remove(f"{to_install}.deb")
 
-        print("INSTALL SUCCESSFUL probably idk")
+        print("INSTALL SUCCESSFUL")
 
     except Exception as e:
         os.remove(f"{to_install}.deb")
