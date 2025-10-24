@@ -4,7 +4,6 @@ import getpass
 import requests
 import sys
 import os
-# from pathlib import Path
 
 tilda = f"/home/{getpass.getuser()}"
 
@@ -16,11 +15,6 @@ def get_web_string(url):
     else:
         print(f"REQUEST ERR - {response.status_code}")
         sys.exit()
-
-# def merge_dirs(parent):
-#     files = [f for f in Path(parent).iterdir() if f.is_file()]
-#
-
 
 def install(to_install):
     to_install = to_install.lower().strip()
@@ -44,23 +38,28 @@ def install(to_install):
     try:
         os.system(f"wget -O {to_install}.deb {string}")
 
-        if not os.path.exists(f"/{tilda}/.pkgbin"):
-            os.system(f"mkdir {tilda}/.pkgbin")
+        if not os.path.exists(f"/{tilda}/.pkgsys"):
+            os.system(f"mkdir {tilda}/.pkgsys")
 
-        if not os.path.exists(f"/{tilda}/.pkgbin/{to_install}"):
-            os.system(f"mkdir {tilda}/.pkgbin/{to_install} && dpkg -x {to_install}.deb {tilda}/.pkgbin/{to_install}")
+        if not os.path.exists(f"/{tilda}/.pkgsys/{to_install}"):
+            os.system(f"mkdir {tilda}/.pkgsys/{to_install} && dpkg -x {to_install}.deb {tilda}/.pkgsys/{to_install}")
 
         else:
-            print(f"PATH {tilda}/.pkgbin/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
+            print(f"PATH {tilda}/.pkgsys/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
             return
 
-        add_path_string = f"PATH=\"{tilda}/.pkgbin/{to_install}/usr/bin/:$PATH\""
+        add_path_string = f"export PATH=\"{tilda}/.pkgsys/{to_install}/usr/bin/:$PATH\""
+
+        if os.path.exists(f"{tilda}/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu"):
+            add_lib_string = f'export LD_LIBRARY_PATH="{tilda}/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"'
+        else:
+            add_lib_string = ""
 
         with open(f"/{tilda}/.pkgrc", "r") as f:
             data = f.read()
 
         with open(f"/{tilda}/.pkgrc", "w") as f:
-            f.write(f"{data}\n{add_path_string}")
+            f.write(f"{data}\n{add_path_string}\n{add_lib_string}")
 
         
         depends = subprocess.run(f"dpkg-deb -f {to_install}.deb Depends", shell=True, stdout=subprocess.PIPE, text=True, stderr=subprocess.STDOUT).stdout
@@ -93,7 +92,7 @@ def install(to_install):
 
     except Exception as e:
         os.remove(f"{to_install}.deb")
-        os.system(f"rm -rf {tilda}/.pkgbin/{to_install}")
+        os.system(f"rm -rf {tilda}/.pkgsys/{to_install}")
 
         print(f"UNHANDLED ERR - {e}")
 

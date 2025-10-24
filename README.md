@@ -12,4 +12,4 @@ source ~/.pkgrc
 `source ~/.pkgrc` everytime you connect to webshell
 `pkg <package-name>` to install things
 `pkgupd` to update your package list (run right after installing any package)
-`pkgrm` remove packages 
+`pkgrm <package-name>` remove things 
