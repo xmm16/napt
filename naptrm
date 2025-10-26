@@ -1,2 +1,2 @@
 #!/bin/bash
-rm -rf /tmp/.pkgsys/$1
+rm -rf /tmp/.naptsys/$1
