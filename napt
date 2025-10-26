@@ -38,29 +38,29 @@ def install(to_install, upgrade=False):
     try:
         os.system(f"wget -O /tmp/{to_install}.deb {string}")
 
-        if not os.path.exists(f"/tmp/.pkgsys"):
-            os.system(f"mkdir /tmp/.pkgsys")
+        if not os.path.exists(f"/tmp/.naptsys"):
+            os.system(f"mkdir /tmp/.naptsys")
 
-        if not os.path.exists(f"/tmp/.pkgsys/{to_install}") or upgrade:
-            os.system(f"mkdir /tmp/.pkgsys/{to_install} && dpkg -x /tmp/{to_install}.deb /tmp/.pkgsys/{to_install}")
+        if not os.path.exists(f"/tmp/.naptsys/{to_install}") or upgrade:
+            os.system(f"mkdir /tmp/.naptsys/{to_install} && dpkg -x /tmp/{to_install}.deb /tmp/.naptsys/{to_install}")
 
         else:
-            print(f"PATH /tmp/.pkgsys/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
+            print(f"PATH /tmp/.naptsys/{to_install} ALREADY EXISTS, SKIPPING INSTALL")
             os.remove(f"/tmp/{to_install}.deb")
             return
 
-        add_path_string = f"export PATH=\"/tmp/.pkgsys/{to_install}/usr/bin/:$PATH\""
-        add_path_string += f"\nexport PATH=\"/tmp/.pkgsys/{to_install}/bin/:$PATH\""
+        add_path_string = f"export PATH=\"/tmp/.naptsys/{to_install}/usr/bin/:$PATH\""
+        add_path_string += f"\nexport PATH=\"/tmp/.naptsys/{to_install}/bin/:$PATH\""
 
-        if os.path.exists(f"/tmp/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu"):
-            add_lib_string = f'export LD_LIBRARY_PATH="/tmp/.pkgsys/{to_install}/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"'
+        if os.path.exists(f"/tmp/.naptsys/{to_install}/usr/lib/x86_64-linux-gnu"):
+            add_lib_string = f'export LD_LIBRARY_PATH="/tmp/.naptsys/{to_install}/usr/lib/x86_64-linux-gnu/:$LD_LIBRARY_PATH"'
         else:
             add_lib_string = ""
 
-        with open(f"/{tilda}/.pkgrc", "r") as f:
+        with open(f"/{tilda}/.naptrc", "r") as f:
             data = f.read()
 
-        with open(f"/{tilda}/.pkgrc", "w") as f:
+        with open(f"/{tilda}/.naptrc", "w") as f:
             f.write(f"{data}\n{add_path_string}\n{add_lib_string}")
 
         # for stdout
@@ -94,7 +94,7 @@ def install(to_install, upgrade=False):
 
     except Exception as e:
         os.remove(f"/tmp/{to_install}.deb")
-        os.system(f"rm -rf /tmp/.pkgsys/{to_install}")
+        os.system(f"rm -rf /tmp/.naptsys/{to_install}")
 
         print(f"UNHANDLED ERR - {e}")
 
@@ -104,8 +104,8 @@ if __name__ == "__main__":
         sys.exit()
 
     if sys.argv[1].lower().strip() == "__rcsetup":
-        with open(f"{tilda}/.pkgrc", 'w') as f:
-            f.write(f"export PATH={tilda}/.pkg/:$PATH\nalias pkgupd=\"source {tilda}/.pkgrc && pkgsave\"")
+        with open(f"{tilda}/.naptrc", 'w') as f:
+            f.write(f"export PATH={tilda}/.napt/:$PATH\nalias naptupd=\"source {tilda}/.naptrc && naptsave\"")
 
         sys.exit()
     if (len(sys.argv) >= 3):
